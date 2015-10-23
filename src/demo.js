@@ -15,13 +15,14 @@ lifeMap.Cell = function(map) {
     this.map = map;
     this.status = Math.floor(Math.random() * 2);
     this.nextStatus = this.status;
+    this.forceStatus = false;
     this.rect = null;
 };
 lifeMap.initialize(tilesOnX, tilesOnY);
 lifeMap.forEachCell(createRectangle);
 lifeMap.forEachCell(showStatus);
 
-setInterval(nextRound.bind(null, lifeMap), roundInterval);
+var interval = setInterval(nextRound.bind(null, lifeMap), roundInterval);
 
 function nextRound(map) {
     map.forEachCell(applyLifeRules);
@@ -37,11 +38,28 @@ function createRectangle(cell, x, y) {
         .attr('height', tileHeight)
         .attr('stroke-width', '1px')
         .attr('stroke', '#EEEEEE')
-        .attr('fill', 'white');
+        .attr('fill', 'white')
+        .on('click', function() {
+            cell.forceStatus = 1;
+            cell.rect.attr('fill', 'black');
+        })
+        .on('dblclick', function() {
+            if (interval !== false) {
+                clearInterval(interval);
+                interval = false;
+            } else {
+                interval = setInterval(nextRound.bind(null, lifeMap), roundInterval);
+            }
+        });
 }
 
 function nextStatus(cell) {
-    cell.status = cell.nextStatus;
+    if (cell.forceStatus !== false) {
+        cell.status = cell.forceStatus;
+        cell.forceStatus = false;
+    } else {
+        cell.status = cell.nextStatus;
+    }
 }
 
 function showStatus(cell) {
