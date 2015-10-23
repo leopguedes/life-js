@@ -17,23 +17,24 @@ var Map = (function() {
         mapWidth = width;
         mapHeight = height;
         var cellsLength = width * height;
-        for (var i = 0; i < cellsLength; i++) {
-            cellsArray[i] = new this.Cell(this);
+        for (var x = 0; x < mapWidth; x++) {
+            cellsArray[x] = [];
+            for (var y = 0; y < mapHeight; y++) {
+                cellsArray[x][y] = new this.Cell(this);
+            }
         }
     };
 
     Map.prototype.forEachCell = function(fn) {
-        cellsArray.forEach(function(cell, index) {
-            fn(cell, getXFromIndex(index), getYFromIndex(index));
+        cellsArray.forEach(function(row, x) {
+            row.forEach(function(cell, y) {
+                fn(cell, x, y);
+            });
         });
     };
 
     Map.prototype.getCellAt = function(x, y) {
-        return this.getCellAtIndex(getIndexFromXY(x, y));
-    };
-
-    Map.prototype.getCellAtIndex = function(index) {
-        return cellsArray[index];
+        return cellsArray[x][y];
     };
 
     Map.prototype.getNeightborhood = function(fromX, fromY, distance) {
@@ -64,18 +65,6 @@ var Map = (function() {
         }
         return neightbors;
     };
-
-    function getXFromIndex(index) {
-        return index % mapWidth;
-    }
-
-    function getYFromIndex(index) {
-        return Math.floor(index / mapWidth);
-    }
-
-    function getIndexFromXY(x, y) {
-        return (y * mapWidth) + x;
-    }
 
     return Map;
 })();
